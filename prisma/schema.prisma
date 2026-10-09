@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum BookingType {
+  FLIGHT
+  HOTEL
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String
+  role      Role      @default(CUSTOMER)
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Flight {
+  id            String    @id @default(cuid())
+  airline       String
+  origin        String
+  destination   String
+  departureTime DateTime
+  arrivalTime   DateTime
+  price         Decimal   @db.Decimal(10, 2)
+  totalSeats    Int
+  availableSeats Int
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("flights")
+}
+
+model Hotel {
+  id             String    @id @default(cuid())
+  name           String
+  location       String
+  pricePerNight  Decimal   @db.Decimal(10, 2)
+  totalRooms     Int
+  availableRooms Int
+  rating         Float
+  bookings       Booking[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("hotels")
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  type        BookingType
+  status      BookingStatus @default(PENDING)
+  totalPrice  Decimal       @db.Decimal(10, 2)
+  flightId    String?
+  flight      Flight?       @relation(fields: [flightId], references: [id])
+  hotelId     String?
+  hotel       Hotel?        @relation(fields: [hotelId], references: [id])
+  checkIn     DateTime?
+  checkOut    DateTime?
+  guests      Int           @default(1)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("bookings")
+}
