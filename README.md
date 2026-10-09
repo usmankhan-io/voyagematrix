@@ -39,8 +39,8 @@ prisma/
 **1. Clone the repository and install dependencies**
 
 ```bash
-git clone <repo-url>
-cd VoyageMatrix-API
+git clone git@github.com:usmankhan-io/voyagematrix.git
+cd voyagematrix
 npm install
 ```
 
